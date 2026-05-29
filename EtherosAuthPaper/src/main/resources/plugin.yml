@@ -1,0 +1,4 @@
+name: EtherosAuthPaper
+version: '${version}'
+main: cn.skilfully.etheros.EtherosAuthPaper
+api-version: '1.17'

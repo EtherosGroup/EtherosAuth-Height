@@ -1,17 +1,29 @@
 package cn.skilfully.etheros;
 
+import cn.skilfully.etheros.etherosframework.di.core.ApplicationContext;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class EtherosAuthPaper extends JavaPlugin {
 
+    private ApplicationContext context;
+
     @Override
     public void onEnable() {
-        // Plugin startup logic
-
+        context = ApplicationContext.run(EtherosAuthPaper.class);
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        if (context != null) {
+            context.shutdown();
+        }
     }
+
+    public static void disable() {
+        PluginManager pm = Bukkit.getPluginManager();
+        pm.disablePlugin(EtherosAuthPaper.getPlugin(EtherosAuthPaper.class));
+    }
+
 }

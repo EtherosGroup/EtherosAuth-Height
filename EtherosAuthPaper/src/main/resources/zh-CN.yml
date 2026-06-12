@@ -1,0 +1,56 @@
+prefix: "&7| &3Etheros&eAuth &7| &r"
+
+loaded-as-language: "zh-CN.yml 已作为插件语言加载！"
+
+reject-message:
+    loading: "&c服务器还在初始化"
+    logged-in: "&c您的帐号已经在此服务器登入了。\n&c如果并非您本人登入，那么你的密码可能已经泄露，请立即联系管理员！"
+    updating: "&c服务器升级中，暂不开放登入"
+    remote-logout: "&c您的帐号已经远程下线"
+    remote-rejected: "&c登入请求被拒绝"
+    banned-local: "&c您已被此服务器封禁"
+    banned-global: "&c您的帐号已被服务提供商全局封禁，因此您无法登入任何使用该服务商的服务器\n&e申诉链接：https://example.com"
+    internal-error: "&c服务器内部错误"
+    not-logged-in: "&c你还没有登入！"
+    login-timeout: "&c您因120s内未登录被踢出"
+
+login:
+    local:
+        title: "&e请使用 &a\"/login <密码>\" &e登入"
+        subtitle: "&a您还有 &e{} &a秒的时间"
+        message: "消息"
+    official:
+        title: ""
+        subtitle: ""
+        message: "&a请访问 &ehttps://example.com/etherosauth.login &a来确认登入请求"
+    custom:
+        title: "大标题"
+        subtitle: "小标题"
+        message: "消息"
+
+error:
+    unknown-auth-type: "&c未知的认证方式 &e{} &c，插件已禁用"
+    register-command: "&c注册命令失败，插件已禁用"
+
+command:
+    incorrect: "&c命令格式错误，请使用 &e/help &c查看帮助"
+    player-only: "&c该命令只能由玩家执行"
+    login:
+        ok: "&a登入成功！"
+        no-account: "&c你还没有注册，请使用 &e/register <密码> <确认密码> &c注册"
+        wrong-password: "&c密码错误"
+    register:
+        ok: "&a注册成功！请使用 &e/login <密码> &a登入"
+        invalid-name: "&c名称不符合规范"
+        account-exists: "&c该账号已经注册过了"
+        invalid-password: "&c密码不符合规范（需要6-32位）"
+        password-mismatch: "&c两次输入的密码不一致"
+        no-enabled: "&c此服务器未启用注册"
+    reset-password:
+        ok: "&a密码修改成功，请重新登入"
+        no-account: "&c账号不存在"
+        wrong-old-password: "&c旧密码错误"
+        same-password: "&c新密码不能与旧密码相同"
+        invalid-password: "&c新密码不符合规范（需要6-32位）"
+
+loaded: "&aEtherosAuth已加载并初始化完成"

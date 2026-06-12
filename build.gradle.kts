@@ -6,7 +6,7 @@ plugins {
 val lombokVersion = "1.18.36"
 val paperApiVersion = "1.17.1-R0.1-SNAPSHOT"
 val velocityApiVersion = "3.3.0-SNAPSHOT"
-val etherosFrameworkVersion = "1.0.7"
+val etherosFrameworkVersion = "1.0.10"
 val configurateVersion = "4.1.2"
 
 allprojects {

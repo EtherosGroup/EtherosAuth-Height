@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.UUID;
+
 @Data
 @Entity
 @Table(name = "player_location",
@@ -14,8 +16,8 @@ import lombok.experimental.Accessors;
 public class PlayerLocationEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
 
     @Column(nullable = false, length = 255)
     private String world = "world";
@@ -30,9 +32,9 @@ public class PlayerLocationEntity {
     private Double z = 0.0;
 
     @Column(nullable = false)
-    private Double yaw = 0.0;
+    private Float yaw = 0F;
 
     @Column(nullable = false)
-    private Double pitch = 0.0;
+    private Float pitch = 0F;
 
 }

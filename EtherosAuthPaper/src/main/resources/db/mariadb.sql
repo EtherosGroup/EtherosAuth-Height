@@ -6,13 +6,13 @@ CREATE TABLE IF NOT EXISTS player_account(
 );
 
 CREATE TABLE IF NOT EXISTS player_location (
-    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    uuid UUID NOT NULL PRIMARY KEY,
     world VARCHAR(255) NOT NULL,
     x DOUBLE NOT NULL,
     y DOUBLE NOT NULL,
     z DOUBLE NOT NULL,
-    yaw DOUBLE NOT NULL,
-    pitch DOUBLE NOT NULL,
+    yaw FLOAT NOT NULL,
+    pitch FLOAT NOT NULL,
 
     INDEX idx_world (world)
 )

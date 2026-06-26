@@ -3,6 +3,7 @@ package cn.skilfully.etheros;
 import cn.skilfully.etheros.config.ConfigManager;
 import cn.skilfully.etheros.database.HibernateUtil;
 import cn.skilfully.etheros.database.entity.PlayerAccountEntity;
+import cn.skilfully.etheros.database.entity.PlayerLocationEntity;
 import cn.skilfully.etheros.etherosframework.di.annotation.Autowired;
 import cn.skilfully.etheros.etherosframework.di.annotation.PostConstruct;
 import cn.skilfully.etheros.etherosframework.di.annotation.Service;
@@ -25,6 +26,7 @@ public class Initializer {
     public void init() {
         try {
             hibernateUtil.registerEntityClass(PlayerAccountEntity.class);
+            hibernateUtil.registerEntityClass(PlayerLocationEntity.class);
             hibernateUtil.getSessionFactory();
             serverService.setLoading(false);
         } catch (Exception e) {

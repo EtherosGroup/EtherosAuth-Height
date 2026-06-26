@@ -3,7 +3,9 @@ package cn.skilfully.etheros.service;
 import cn.skilfully.etheros.EtherosAuthPaper;
 import cn.skilfully.etheros.config.ConfigManager;
 import cn.skilfully.etheros.database.AuthDAO;
+import cn.skilfully.etheros.database.PlayerLocationDAO;
 import cn.skilfully.etheros.database.entity.PlayerAccountEntity;
+import cn.skilfully.etheros.database.entity.PlayerLocationEntity;
 import cn.skilfully.etheros.etherosframework.di.annotation.Autowired;
 import cn.skilfully.etheros.etherosframework.di.annotation.PostConstruct;
 import cn.skilfully.etheros.etherosframework.di.annotation.PreDestroy;
@@ -14,6 +16,9 @@ import cn.skilfully.etheros.utils.PasswordUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -31,12 +36,17 @@ public class LocalAuthService {
     private AuthDAO authDAO;
 
     @Autowired
+    private PlayerLocationDAO playerLocationDAO;
+
+    @Autowired
     private PlayerService playerService;
 
     @Autowired
     private ConfigManager configManager;
 
     private static final EtherosAuthPaper plugin = EtherosAuthPaper.getPlugin(EtherosAuthPaper.class);
+
+    private Location loginLocation = null;
 
     @PostConstruct
     private void init() {
@@ -62,12 +72,47 @@ public class LocalAuthService {
             }
         };
         titleTaskId = Bukkit.getScheduler().runTaskTimer(plugin, this::sendLoginTitles, 20L, 20L).getTaskId();
+        String loginWorldName = configManager.getPluginConfig().getAuthentication().getAction().getLocate().getWorld();
+        World loginWorld = Bukkit.getWorld(loginWorldName);
+        if (loginWorld == null) {
+            Messenger.consoleError(configManager.getPluginLanguage().getError().getUnknownWorld(), loginWorldName);
+            EtherosAuthPaper.disable();
+            return;
+        }
+        loginLocation = new Location(
+                loginWorld,
+                configManager.getPluginConfig().getAuthentication().getAction().getLocate().getX(),
+                configManager.getPluginConfig().getAuthentication().getAction().getLocate().getY(),
+                configManager.getPluginConfig().getAuthentication().getAction().getLocate().getZ(),
+                configManager.getPluginConfig().getAuthentication().getAction().getLocate().getYaw(),
+                configManager.getPluginConfig().getAuthentication().getAction().getLocate().getPitch()
+        );
     }
 
     @PreDestroy
     private void destroy() {
         if (titleTaskId != -1) {
             Bukkit.getScheduler().cancelTask(titleTaskId);
+        }
+    }
+
+    public void reload(CommandSender sender) {
+        if (sender == null) {
+            sender = Bukkit.getConsoleSender();
+        }
+        String loginWorldName = getConfigWorld();
+        World loginWorld = Bukkit.getWorld(loginWorldName);
+        if (loginWorld == null) {
+            Messenger.sendAutoError(sender, configManager.getPluginLanguage().getFailed().getReload(), "LocalAuthService", "未知世界名称 " + loginWorldName);
+        } else {
+            loginLocation = new Location(
+                    loginWorld,
+                    configManager.getPluginConfig().getAuthentication().getAction().getLocate().getX(),
+                    configManager.getPluginConfig().getAuthentication().getAction().getLocate().getY(),
+                    configManager.getPluginConfig().getAuthentication().getAction().getLocate().getZ(),
+                    configManager.getPluginConfig().getAuthentication().getAction().getLocate().getYaw(),
+                    configManager.getPluginConfig().getAuthentication().getAction().getLocate().getPitch()
+            );
         }
     }
 
@@ -78,6 +123,9 @@ public class LocalAuthService {
         PlayerAccountEntity playerAccountEntity = optionalPlayerAccountEntity.get();
         if (PasswordUtil.verify(password, playerAccountEntity.getPassword())) {
             playerService.removeNoLoginPlayer(uuid);
+            if (configManager.getPluginConfig().getAuthentication().getAction().getLocate().getAutoReturn()) {
+                tpReturn(uuid);
+            }
             return LoginResult.OK;
         }
         return LoginResult.WRONG_PASSWORD;
@@ -119,6 +167,37 @@ public class LocalAuthService {
 
     public void adminDelete(UUID uuid) {
 
+    }
+
+    public void tpToLoginLocate(Player player) {
+        player.teleportAsync(loginLocation);
+    }
+
+    private void tpReturn(UUID uuid) {
+        var oeLocation = playerLocationDAO.findByUuid(uuid);
+        if (oeLocation.isEmpty()) {
+            return;
+        }
+        var eLocation = oeLocation.get();
+        World world = Bukkit.getWorld(eLocation.getWorld());
+        if (world == null) {
+            Messenger.consoleError(configManager.getPluginLanguage().getFailed().getTp(), "未知世界：" + eLocation.getWorld());
+            return;
+        }
+        Location target = new Location(
+                world,
+                eLocation.getX(),
+                eLocation.getY(),
+                eLocation.getZ(),
+                eLocation.getYaw(),
+                eLocation.getPitch()
+        );
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) {
+            Messenger.consoleError(configManager.getPluginLanguage().getFailed().getTp(), "未知玩家（UUID）：" + uuid);
+            return;
+        }
+        player.teleportAsync(target);
     }
 
     private boolean checkPassword(String password) {
@@ -220,6 +299,11 @@ public class LocalAuthService {
 
     public enum ResetPasswordResult {
         OK, NO_ACCOUNT, WRONG_OLD_PASSWORD, SAME_PASSWORD, INVALID_PASSWORD
+    }
+
+    // utils
+    private String getConfigWorld() {
+        return configManager.getPluginConfig().getAuthentication().getAction().getLocate().getWorld();
     }
 
 }

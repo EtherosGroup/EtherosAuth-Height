@@ -2,15 +2,14 @@ package cn.skilfully.etheros.listener;
 
 import cn.skilfully.etheros.EtherosAuthPaper;
 import cn.skilfully.etheros.config.ConfigManager;
+import cn.skilfully.etheros.database.PlayerLocationDAO;
+import cn.skilfully.etheros.database.entity.PlayerLocationEntity;
 import cn.skilfully.etheros.etherosframework.di.annotation.Autowired;
 import cn.skilfully.etheros.etherosframework.di.annotation.PostConstruct;
-import cn.skilfully.etheros.etherosframework.di.annotation.PreDestroy;
 import cn.skilfully.etheros.etherosframework.di.annotation.Service;
 import cn.skilfully.etheros.service.*;
 import cn.skilfully.etheros.utils.ComponentTextUtil;
 import cn.skilfully.etheros.utils.Messenger;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -20,14 +19,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitTask;
 
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Service
 public class PlayerLoginEventListener implements Listener {
@@ -49,6 +43,9 @@ public class PlayerLoginEventListener implements Listener {
 
     @Autowired
     private LocalAuthService localAuthService;
+
+    @Autowired
+    private PlayerLocationDAO playerLocationDAO;
 
     private Function<UUID, Boolean> checkBanned;
 
@@ -108,19 +105,37 @@ public class PlayerLoginEventListener implements Listener {
             return;
         }
 
+        if (configManager.getPluginConfig().getAuthentication().getAction().getLocate().getAutoReturn()) {
+            localAuthService.tpToLoginLocate(newPlayer);
+        }
+
         playerService.addNoLoginPlayer(newPlayer.getUniqueId());
         localAuthService.runMessageTask(newPlayer.getUniqueId());
-
-        Location location = newPlayer.getLocation();
-        //TODO 如果auto-return = true则记录当前位置到数据库，然后tp到locate中的位置
-
 
         event.allow();
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        localAuthService.removeMessageTask(event.getPlayer().getUniqueId());
+        Player player = event.getPlayer();
+        localAuthService.removeMessageTask(player.getUniqueId());
+        if (configManager.getPluginConfig().getAuthentication().getAction().getLocate().getAutoReturn()) {
+            Location location = player.getLocation();
+            PlayerLocationEntity locationEntity = new PlayerLocationEntity();
+            locationEntity
+                    .setUuid(player.getUniqueId())
+                    .setX(location.getX())
+                    .setY(location.getY())
+                    .setZ(location.getZ())
+                    .setYaw(location.getYaw())
+                    .setPitch(location.getPitch())
+                    .setWorld(location.getWorld().getName());
+            if (playerLocationDAO.existsByUuid(locationEntity.getUuid())) {
+                playerLocationDAO.update(locationEntity);
+            } else {
+                playerLocationDAO.create(locationEntity);
+            }
+        }
     }
 
 }

@@ -10,7 +10,6 @@ import cn.skilfully.etheros.utils.ComponentTextUtil;
 import cn.skilfully.etheros.utils.Messenger;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

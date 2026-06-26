@@ -21,6 +21,8 @@ public class LanguageConfig {
     @Setting
     private Error error;
     @Setting
+    private Failed failed;
+    @Setting
     private Command command;
 
     @Data
@@ -99,6 +101,18 @@ public class LanguageConfig {
         private String unknownAuthType;
         @Setting("register-command")
         private String registerCommand;
+        @Setting("unknown-world")
+        private String unknownWorld;
+
+    }
+
+    @Data
+    @ConfigSerializable
+    public static class Failed {
+        @Setting
+        private String reload;
+        @Setting
+        private String tp;
     }
 
     @Data

@@ -63,9 +63,9 @@ public class PluginConfig {
                 @Setting
                 private Double z;
                 @Setting
-                private Double yaw;
+                private Float yaw;
                 @Setting
-                private Double pitch;
+                private Float pitch;
                 @Setting("auto-return")
                 private Boolean autoReturn;
             }

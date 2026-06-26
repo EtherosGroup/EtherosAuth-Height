@@ -31,6 +31,11 @@ login:
 error:
     unknown-auth-type: "&c未知的认证方式 &e{} &c，插件已禁用"
     register-command: "&c注册命令失败，插件已禁用"
+    unknown-world: "&c未知的世界 {} 导致插件加载失败，插件已禁用"
+
+failed:
+    reload: "&c模块 {} 因 {} 重载失败"
+    tp: "&c传送实体失败：{}"
 
 command:
     incorrect: "&c命令格式错误，请使用 &e/help &c查看帮助"

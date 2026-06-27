@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -94,6 +95,13 @@ public class PlayerLoginEventListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (configManager.getPluginConfig().getAuthentication().getAction().getLocate().getAutoReturn()) {
+            localAuthService.tpToLoginLocate(event.getPlayer());
+        }
+    }
+
+    @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
         Player newPlayer = event.getPlayer();
         if (serverService.isLoading()) {
@@ -103,10 +111,6 @@ public class PlayerLoginEventListener implements Listener {
         if (serverService.isUpdating()) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, ComponentTextUtil.text(configManager.getPluginLanguage().getRejectMessage().getUpdating()));
             return;
-        }
-
-        if (configManager.getPluginConfig().getAuthentication().getAction().getLocate().getAutoReturn()) {
-            localAuthService.tpToLoginLocate(newPlayer);
         }
 
         playerService.addNoLoginPlayer(newPlayer.getUniqueId());

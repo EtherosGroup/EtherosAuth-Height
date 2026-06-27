@@ -11,7 +11,7 @@ val configurateVersion = "4.1.2"
 
 allprojects {
     group = "com.skilfully.etheros"
-    version = "1.0.1"
+    version = "1.0.2"
 
     repositories {
         mavenCentral()

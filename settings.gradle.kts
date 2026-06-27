@@ -5,4 +5,4 @@ pluginManagement {
 }
 
 rootProject.name = "EtherosAuth-Height"
-include("EtherosAuthPaper", "EtherosAuthVelocity")
+include("EtherosAuthBukkit", "EtherosAuthVelocity")
